@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jewish Spiritual Companion</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #f8f8f8;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .prayer-times {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .time-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .parsha-insights {
+            background-color: #fff3e0;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .astronomical-data {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .reminders {
+            list-style: none;
+            padding: 0;
+        }
+        .reminder-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Jewish Spiritual Companion</h1>
+        
+        <div class="section">
+            <h2>Daily Prayer Times</h2>
+            <div class="prayer-times" id="prayerTimes">
+                <!-- Prayer times will be populated here -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Weekly Parsha</h2>
+            <div class="parsha-insights" id="parshaInsights">
+                <!-- Parsha insights will be populated here -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Astronomical Data</h2>
+            <div class="astronomical-data" id="astronomicalData">
+                <!-- Astronomical data will be populated here -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Practical Reminders</h2>
+            <ul class="reminders" id="remindersList">
+                <!-- Reminders will be populated here -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        async function fetchPrayerTimes() {
+            try {
+                const response = await fetch('http://localhost:8000/prayer-times/31.7719/35.2170'); // Default to Jerusalem
+                const data = await response.json();
+                const prayerTimesDiv = document.getElementById('prayerTimes');
+                prayerTimesDiv.innerHTML = `
+                    <div class="time-item">Sunrise: ${data.sunrise}</div>
+                    <div class="time-item">Sunset: ${data.sunset}</div>
+                    <div class="time-item">Shacharit: ${data.shacharit}</div>
+                    <div class="time-item">Mincha: ${data.mincha}</div>
+                    <div class="time-item">Maariv: ${data.maariv}</div>
+                    <div class="time-item">Tefillin: ${data.tefillin}</div>
+                `;
+            } catch (error) {
+                console.error('Error fetching prayer times:', error);
+            }
+        }
+
+        async function fetchParshaInsights() {
+            try {
+                const response = await fetch('http://localhost:8000/weekly-parsha');
+                const data = await response.json();
+                const parshaDiv = document.getElementById('parshaInsights');
+                parshaDiv.innerHTML = `
+                    <p><strong>Parsha:</strong> ${data.parsha_name} (${data.hebrew_name})</p>
+                    <p><strong>Reading Date:</strong> ${data.reading_date}</p>
+                    <h3>Chassidic Insight</h3>
+                    <p>${data.chassidic_insight}</p>
+                    <h3>Kabbalistic Perspective</h3>
+                    <p>${data.kabbalistic_perspective}</p>
+                `;
+            } catch (error) {
+                console.error('Error fetching parsha insights:', error);
+            }
+        }
+
+        async function fetchAstronomicalData() {
+            try {
+                const response = await fetch('http://localhost:8000/astronomical-data');
+                const data = await response.json();
+                const astroDiv = document.getElementById('astronomicalData');
+                astroDiv.innerHTML = `
+                    <p><strong>Moon Phase:</strong> ${data.moon_phase}</p>
+                    <p><strong>Tide:</strong> ${data.tide}</p>
+                    <p><strong>Mazalot:</strong> ${data.mazalot}</p>
+                `;
+            } catch (error) {
+                console.error('Error fetching astronomical data:', error);
+            }
+        }
+
+        async function fetchReminders() {
+            try {
+                const response = await fetch('http://localhost:8000/practical-reminders');
+                const data = await response.json();
+                const remindersList = document.getElementById('remindersList');
+                
+                const todayReminders = data.reminders.today.map(reminder => `
+                    <li class="reminder-item">Today: ${reminder}</li>
+                `).join('');
+                
+                const weekReminders = data.reminders.this_week.map(reminder => `
+                    <li class="reminder-item">This week: ${reminder}</li>
+                `).join('');
+                
+                remindersList.innerHTML = todayReminders + weekReminders;
+            } catch (error) {
+                console.error('Error fetching reminders:', error);
+            }
+        }
+
+        // Load all data when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchPrayerTimes();
+            fetchParshaInsights();
+            fetchAstronomicalData();
+            fetchReminders();
+        });
+    </script>
+</body>
+</html>
